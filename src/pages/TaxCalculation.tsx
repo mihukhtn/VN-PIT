@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import type { Database } from '../types/supabase'
 import { FileSpreadsheet, Search, Calculator, Calendar } from 'lucide-react'
 import Modal from '../components/Modal'
+import TaxDetailModal from '../components/TaxDetailModal'
 import * as XLSX from 'xlsx'
 import { calculatePIT, formatCurrency } from '../utils/tax'
 
@@ -17,6 +18,7 @@ export default function TaxCalculation() {
     const [isImportOpen, setIsImportOpen] = useState(false)
     const [importing, setImporting] = useState(false)
     const [search, setSearch] = useState('')
+    const [detailModalData, setDetailModalData] = useState<{ name: string, taxable: number, tax: number } | null>(null)
 
     const fetchRecords = async () => {
         setLoading(true)
@@ -201,7 +203,7 @@ export default function TaxCalculation() {
                                 <tr><td colSpan={8} className="p-8 text-center text-slate-500">Chưa có dữ liệu tính thuế cho tháng này</td></tr>
                             ) : (
                                 filtered.map(rec => (
-                                    <tr key={rec.id} className="border-b last:border-0 hover:bg-slate-50">
+                                    <tr key={rec.id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
                                         <td className="p-4 sticky left-0 bg-white">
                                             <div className="font-medium text-slate-900">{rec.employees?.full_name}</div>
                                             <div className="text-xs text-slate-500">{rec.employees?.code}</div>
@@ -212,7 +214,17 @@ export default function TaxCalculation() {
                                         <td className="p-4 text-right text-slate-500">{formatCurrency(rec.self_deduction || 0)}</td>
                                         <td className="p-4 text-right text-slate-500">{formatCurrency(rec.dependent_deduction || 0)}</td>
                                         <td className="p-4 text-right font-medium text-slate-800">{formatCurrency(rec.taxable_income || 0)}</td>
-                                        <td className="p-4 text-right font-bold text-primary-600 sticky right-0 bg-white shadow-sm border-l">{formatCurrency(rec.tax_amount || 0)}</td>
+                                        <td
+                                            className="p-4 text-right font-bold text-primary-600 sticky right-0 bg-white shadow-sm border-l cursor-pointer hover:bg-primary-50 active:text-primary-800 underline decoration-dotted underline-offset-4"
+                                            onClick={() => setDetailModalData({
+                                                name: rec.employees?.full_name || '',
+                                                taxable: rec.taxable_income || 0,
+                                                tax: rec.tax_amount || 0
+                                            })}
+                                            title="Bấm để xem chi tiết tính thuế"
+                                        >
+                                            {formatCurrency(rec.tax_amount || 0)}
+                                        </td>
                                     </tr>
                                 ))
                             )}
@@ -250,6 +262,15 @@ export default function TaxCalculation() {
                     )}
                 </div>
             </Modal>
+
+            {detailModalData && (
+                <TaxDetailModal
+                    isOpen={!!detailModalData}
+                    onClose={() => setDetailModalData(null)}
+                    employeeName={detailModalData.name}
+                    taxableIncome={detailModalData.taxable}
+                />
+            )}
         </div>
     )
 }
