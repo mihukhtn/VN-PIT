@@ -19,7 +19,7 @@ export default function TaxDetailModal({ isOpen, onClose, employeeName, taxableI
     const calculatedTotalTax = details.reduce((sum, item) => sum + item.taxAmount, 0)
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`Chi tiết thuế TNCN - ${employeeName}`}>
+        <Modal isOpen={isOpen} onClose={onClose} title={`Chi tiết thuế TNCN - ${employeeName}`} maxWidth="max-w-4xl">
             <div className="space-y-4">
                 <h4 className="text-primary-600 font-medium">(*) Chi tiết thuế thu nhập cá nhân (VNĐ)</h4>
 

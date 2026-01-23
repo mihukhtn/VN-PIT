@@ -7,9 +7,10 @@ interface ModalProps {
     onClose: () => void
     title: string
     children: React.ReactNode
+    maxWidth?: string
 }
 
-export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }: ModalProps) {
     useEffect(() => {
         if (isOpen) document.body.style.overflow = 'hidden'
         else document.body.style.overflow = 'unset'
@@ -27,7 +28,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
             />
 
             {/* Content */}
-            <div className="relative z-50 w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className={`relative z-50 w-full ${maxWidth} bg-white rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200`}>
                 <div className="flex items-center justify-between border-b px-6 py-4 bg-slate-50">
                     <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
                     <button
